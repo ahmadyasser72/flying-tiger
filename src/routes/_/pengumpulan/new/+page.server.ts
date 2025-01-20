@@ -17,16 +17,11 @@ export const actions: Actions = {
 		const form = await superValidate(event, zod(formSchema));
 		if (!form.valid) return fail(400, { form });
 
-		const data = {
-			...form.data,
-			batasWaktu: new Date(form.data.batasWaktu.valueOf() + 24 * 60 * 60 * 1000 - 1)
-		};
-
 		const [{ pengumpulanLink }] = await db
 			.insert(pengumpulan)
-			.values(data)
+			.values(form.data)
 			.returning({ pengumpulanLink: pengumpulan.slug })
-			.onConflictDoUpdate({ target: pengumpulan.slug, set: data })
+			.onConflictDoUpdate({ target: pengumpulan.slug, set: form.data })
 			.execute();
 
 		return { form, redirectTo: `/p/${pengumpulanLink}` };

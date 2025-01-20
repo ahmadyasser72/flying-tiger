@@ -1,15 +1,12 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { buttonVariants } from '$lib/components/ui/button';
-	import { Calendar } from '$lib/components/ui/calendar';
+	import { DateTimePicker } from '$lib/components/ui/date-time-picker';
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
-	import * as Popover from '$lib/components/ui/popover';
 	import { Textarea } from '$lib/components/ui/textarea';
-	import { cn, dateFormatter } from '$lib/utils';
 	import { formSchema, type FormSchema } from '.';
-	import { getLocalTimeZone, type DateValue, today } from '@internationalized/date';
-	import { CalendarIcon, LoaderPinwheel } from 'lucide-svelte';
+	import { getLocalTimeZone, now, parseAbsoluteToLocal } from '@internationalized/date';
+	import { LoaderPinwheel } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -36,8 +33,11 @@
 	const { form: formData, enhance, delayed } = form;
 
 	const isEdit = $derived($formData.id !== undefined);
-	const batasWaktu = $derived($formData.batasWaktu);
-	let placeholder = $state<DateValue>(today(getLocalTimeZone()));
+	const batasWaktuPlaceholder = $derived(
+		$formData.batasWaktu
+			? parseAbsoluteToLocal($formData.batasWaktu.toISOString())
+			: now(getLocalTimeZone())
+	);
 </script>
 
 <form method="POST" use:enhance class="w-full space-y-4">
@@ -82,35 +82,14 @@
 	<Form.Field {form} name="batasWaktu" class="flex flex-col">
 		<Form.Control>
 			{#snippet children({ props })}
-				<Form.Label>Batas waktu</Form.Label>
-				<Popover.Root>
-					<Popover.Trigger
-						{...props}
-						class={cn(
-							buttonVariants({ variant: 'outline' }),
-							'justify-start pl-4 text-left font-normal',
-							!batasWaktu && 'text-muted-foreground'
-						)}
-					>
-						{batasWaktu ? dateFormatter.format(batasWaktu) : 'Pilih tanggal'}
-						<CalendarIcon class="ml-auto size-4 opacity-50" />
-					</Popover.Trigger>
-					<Popover.Content class="w-auto p-0" side="top">
-						<Calendar
-							type="single"
-							bind:placeholder
-							minValue={today(getLocalTimeZone())}
-							onValueChange={(v) => {
-								if (v) {
-									$formData.batasWaktu = v.toDate(getLocalTimeZone());
-								} else {
-									$formData.batasWaktu = new Date();
-								}
-							}}
-						/>
-					</Popover.Content>
-				</Popover.Root>
-				<Form.Description>Batas waktu mengumpulkan akan diset pada jam 23:59.</Form.Description>
+				<Form.Label>Batas Waktu</Form.Label>
+				<DateTimePicker
+					date={batasWaktuPlaceholder}
+					setDate={(v) => {
+						$formData.batasWaktu = v?.toDate(getLocalTimeZone()) ?? new Date();
+					}}
+				/>
+				<Form.Description>Pengumpulan akan ditutup bila melewati batas waktu.</Form.Description>
 				<Form.FieldErrors />
 				<input hidden value={$formData.batasWaktu} name={props.name} />
 			{/snippet}

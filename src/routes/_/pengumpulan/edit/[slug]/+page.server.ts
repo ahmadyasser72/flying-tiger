@@ -23,17 +23,12 @@ export const actions: Actions = {
 	default: async (event) => {
 		const form = await superValidate(event, zod(formSchema));
 		if (!form.valid) return fail(400, { form });
-
-		const data = {
-			...form.data,
-			batasWaktu: new Date(form.data.batasWaktu.valueOf() + 24 * 60 * 60 * 1000 - 1)
-		};
-		if (data.id === undefined) return fail(400, { form });
+		else if (form.data.id === undefined) return fail(400, { form });
 
 		const [{ pengumpulanLink }] = await db
 			.update(pengumpulan)
-			.set(data)
-			.where(eq(pengumpulan.id, data.id))
+			.set(form.data)
+			.where(eq(pengumpulan.id, form.data.id))
 			.returning({ pengumpulanLink: pengumpulan.slug })
 			.execute();
 
