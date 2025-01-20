@@ -1,14 +1,15 @@
 import type { Handle, ServerLoadEvent } from '@sveltejs/kit';
 
 export const handle: Handle = ({ event, resolve }) => {
-	event.locals.authorized = basicAuth(event);
-	if (
-		!event.locals.authorized &&
-		(event.cookies.get('login') === '1' || event.url.pathname.startsWith('/_/'))
-	) {
+	const login = event.cookies.get('login') === '1';
+	event.locals.authorized = login && basicAuth(event);
+	if (!event.locals.authorized && (login || event.url.pathname.startsWith('/_/'))) {
 		return new Response('401 Unauthorized', {
 			status: 401,
-			headers: { 'WWW-Authenticate': 'Basic realm="admin-only", charset="UTF-8"' }
+			headers: {
+				'WWW-Authenticate': 'Basic realm="admin-only", charset="UTF-8"',
+				'Set-Cookie': 'login=; path=/'
+			}
 		});
 	}
 
