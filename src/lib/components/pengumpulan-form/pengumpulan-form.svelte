@@ -9,7 +9,7 @@
 	import { cn, dateFormatter } from '$lib/utils';
 	import { formSchema, type FormSchema } from '.';
 	import { getLocalTimeZone, type DateValue, today } from '@internationalized/date';
-	import { CalendarIcon } from 'lucide-svelte';
+	import { CalendarIcon, LoaderPinwheel } from 'lucide-svelte';
 	import { toast } from 'svelte-sonner';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
@@ -33,7 +33,7 @@
 		}
 	});
 
-	const { form: formData, enhance } = form;
+	const { form: formData, enhance, delayed } = form;
 
 	const isEdit = $derived($formData.id !== undefined);
 	const batasWaktu = $derived($formData.batasWaktu);
@@ -117,5 +117,10 @@
 		</Form.Control>
 	</Form.Field>
 
-	<Form.Button>Submit</Form.Button>
+	<div class="flex items-center">
+		<Form.Button>Submit</Form.Button>
+		{#if $delayed}
+			<LoaderPinwheel class="ml-2 animate-spin" />
+		{/if}
+	</div>
 </form>

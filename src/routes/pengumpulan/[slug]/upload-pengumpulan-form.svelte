@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
 	import { formSchema, type FormSchema } from './schema';
+	import { LoaderPinwheel } from 'lucide-svelte';
 	import prettyBytes from 'pretty-bytes';
 	import { toast } from 'svelte-sonner';
 	import { superForm, fileProxy, type Infer, type SuperValidated } from 'sveltekit-superforms';
@@ -18,13 +18,13 @@
 			if (form.valid) {
 				toast.success('Berhasil mengirimkan pengumpulan!', {
 					duration: 2000,
-					onAutoClose: () => goto('/')
+					onAutoClose: () => window.location.reload()
 				});
 			}
 		}
 	});
 
-	const { form: formData, enhance } = form;
+	const { form: formData, enhance, delayed } = form;
 
 	const file = fileProxy(form, 'file');
 </script>
@@ -73,5 +73,10 @@
 		<Form.FieldErrors />
 	</Form.Field>
 
-	<Form.Button {disabled}>Submit</Form.Button>
+	<div class="flex items-center">
+		<Form.Button {disabled}>Submit</Form.Button>
+		{#if $delayed}
+			<LoaderPinwheel class="ml-2 animate-spin" />
+		{/if}
+	</div>
 </form>
