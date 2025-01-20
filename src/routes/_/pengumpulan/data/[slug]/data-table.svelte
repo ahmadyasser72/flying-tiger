@@ -54,13 +54,15 @@
 
 	const selectedRows = $derived(table.getSelectedRowModel().rows);
 	const downloadSelectedRowFilesUrl = $derived.by(() => {
+		if (selectedRows.length === 0) return;
+
 		const ids = selectedRows.map(({ original }) => original.id);
 		return `/_/pengumpulan/item/${ids.join('+')}`;
 	});
 </script>
 
 <div class="mb-2 flex justify-between">
-	<Button target="_blank" href={downloadSelectedRowFilesUrl} disabled={selectedRows.length === 0}>
+	<Button target="_blank" href={downloadSelectedRowFilesUrl}>
 		Download {selectedRows.length} data
 	</Button>
 	<Button href="/p/{page.params.slug}" variant="outline">Kembali ke pengumpulan</Button>
