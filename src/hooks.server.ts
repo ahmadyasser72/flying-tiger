@@ -1,9 +1,10 @@
 import type { Handle, ServerLoadEvent } from '@sveltejs/kit';
 
 export const handle: Handle = ({ event, resolve }) => {
-	const login = event.cookies.get('login') === '1';
-	event.locals.authorized = login && basicAuth(event);
-	if (!event.locals.authorized && (login || event.url.pathname.startsWith('/_/'))) {
+	const requireLogin = event.cookies.get('login') === '1' || event.url.pathname.startsWith('/_/');
+
+	event.locals.authorized = requireLogin && basicAuth(event);
+	if (requireLogin && !event.locals.authorized) {
 		return new Response('401 Unauthorized', {
 			status: 401,
 			headers: {
