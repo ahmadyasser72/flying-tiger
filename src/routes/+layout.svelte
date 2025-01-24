@@ -28,7 +28,8 @@
 			<button onclick={login}>Login</button>
 		{/if}
 	</header>
-	<main class="relative mx-auto flex h-full w-full max-w-[60ch] flex-1 py-4">
+
+	<main class="relative mx-auto flex h-full w-full max-w-[60ch] flex-1 flex-col py-4">
 		{@render children()}
 	</main>
 </div>

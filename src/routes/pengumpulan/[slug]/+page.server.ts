@@ -7,13 +7,10 @@ import { fail, message, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
 export const load: PageServerLoad = async ({ params }) => {
-	const pengumpulan = await db.query.pengumpulan.findFirst({
-		where: (pengumpulan, { eq }) => eq(pengumpulan.slug, params.slug)
-	});
-	if (pengumpulan === undefined) error(404, 'Not found');
-
 	return {
-		pengumpulan,
+		pengumpulan: db.query.pengumpulan.findFirst({
+			where: (pengumpulan, { eq }) => eq(pengumpulan.slug, params.slug)
+		}),
 		form: await superValidate(zod(formSchema))
 	};
 };

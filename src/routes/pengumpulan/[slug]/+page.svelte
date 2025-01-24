@@ -1,28 +1,22 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import { Button } from '$lib/components/ui/button';
-	import { dateTimeFormatter } from '$lib/utils';
 	import type { PageData } from './$types';
-	import UploadPengumpulanForm from './upload-pengumpulan-form.svelte';
-	import { formatDistanceToNow } from 'date-fns';
-	import { id } from 'date-fns/locale';
+	import PengumpulanView from './pengumpulan-view.svelte';
+	import { LoaderPinwheel, TriangleAlert } from 'lucide-svelte';
 
 	let { data }: { data: PageData } = $props();
-
-	const { pengumpulan } = $derived(data);
-	const lewatBatasWaktu = $derived(new Date() >= pengumpulan.batasWaktu);
-
-	const [pengumpulanTerakhir, pengumpulanTerakhirDistance] = $derived([
-		dateTimeFormatter.format(pengumpulan.batasWaktu),
-		formatDistanceToNow(pengumpulan.batasWaktu, { locale: id })
-	]);
 </script>
 
 <svelte:head>
-	<title>Pengumpulan {pengumpulan.judul}</title>
+	{#await data.pengumpulan}
+		<title>Pengumpulan {page.params.slug}</title>
+	{:then pengumpulan}
+		<title>Pengumpulan {pengumpulan?.judul ?? page.params.slug}</title>
+	{/await}
 </svelte:head>
 
-<div class="flex w-full flex-col items-center">
+<div class="flex w-full flex-1 flex-col items-center">
 	{#if data.authorized}
 		<div class="mb-4 flex w-full gap-2 border-b pb-4">
 			<Button href="/_/pengumpulan/data/{page.params.slug}">Lihat data</Button>
@@ -30,30 +24,19 @@
 		</div>
 	{/if}
 
-	<h1 class="scroll-m-20 text-center text-4xl font-extrabold tracking-tight lg:text-5xl">
-		{pengumpulan.judul}
-	</h1>
-
-	<p class="mt-2 text-center text-sm">
-		<span>{pengumpulanTerakhir}</span>
-		<span class="font-semibold">
-			({#if lewatBatasWaktu}
-				terlambat {pengumpulanTerakhirDistance}
-			{:else}
-				{pengumpulanTerakhirDistance} lagi
-			{/if})
-		</span>
-	</p>
-
-	<p class="mt-4 text-center" class:line-through={lewatBatasWaktu}>
-		{pengumpulan.deskripsi}.
-	</p>
-
-	{#if lewatBatasWaktu}
-		<p class="text-center">Pengumpulan ini sudah ditutup!</p>
-	{/if}
-
-	<div class="mt-8">
-		<UploadPengumpulanForm {data} disabled={lewatBatasWaktu} />
-	</div>
+	{#await data.pengumpulan}
+		<div class="flex flex-1 flex-col items-center justify-center">
+			<LoaderPinwheel class="h-32 w-32 animate-spin" />
+			<p class="mt-2 text-xl font-semibold">Loading pengumpulan...</p>
+		</div>
+	{:then pengumpulan}
+		{#if pengumpulan !== undefined}
+			<PengumpulanView {pengumpulan} form={data.form} />
+		{:else}
+			<div class="flex flex-1 flex-col items-center justify-center">
+				<TriangleAlert class="h-32 w-32 text-red-500" />
+				<p class="mt-2 text-xl font-semibold">Pengumpulan tidak ditemukan!</p>
+			</div>
+		{/if}
+	{/await}
 </div>
