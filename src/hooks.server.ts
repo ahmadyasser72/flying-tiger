@@ -12,7 +12,7 @@ export const authorizeAdmin = ({ cookies, url }: Pick<RequestEvent, 'cookies' | 
 	const cookieKey = cookies.get('adminKey');
 	if (cookieKey === ADMIN_KEY && !url.searchParams.has('noAdminKey')) return true;
 	else {
-		cookies.delete('adminKey', { path: '/' });
+		cookies.delete('adminKey', { path: '/', sameSite: 'strict' });
 		if (url.searchParams.has('noAdminKey')) {
 			url.searchParams.delete('noAdminKey');
 			redirect(url, { type: 'success', message: 'Logout berhasil!' }, cookies);
@@ -24,7 +24,7 @@ export const authorizeAdmin = ({ cookies, url }: Pick<RequestEvent, 'cookies' | 
 
 	url.searchParams.delete('adminKey');
 	if (urlQueryKey === ADMIN_KEY) {
-		cookies.set('adminKey', urlQueryKey, { path: '/' });
+		cookies.set('adminKey', urlQueryKey, { path: '/', sameSite: 'strict' });
 		redirect(url, { type: 'success', message: 'Login berhasil!' }, cookies);
 	} else {
 		redirect(url, { type: 'error', message: 'Kata kunci admin salah!' }, cookies);
