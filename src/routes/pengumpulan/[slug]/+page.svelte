@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import ErrorView from '$lib/components/error-view.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import type { PageData } from './$types';
 	import PengumpulanView from './pengumpulan-view.svelte';
@@ -33,10 +34,7 @@
 		{#if pengumpulan !== undefined}
 			<PengumpulanView {pengumpulan} form={data.form} />
 		{:else}
-			<div class="flex flex-1 flex-col items-center justify-center">
-				<TriangleAlert class="h-32 w-32 text-red-500" />
-				<p class="mt-2 text-xl font-semibold">Pengumpulan tidak ditemukan!</p>
-			</div>
+			<ErrorView message="Pengumpulan tidak ditemukan!" status={404} />
 		{/if}
 	{/await}
 </div>

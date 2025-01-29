@@ -1,28 +1,32 @@
-import type { Handle, ServerLoadEvent } from '@sveltejs/kit';
+import { ADMIN_KEY } from '$env/static/private';
+import type { Handle, RequestEvent } from '@sveltejs/kit';
+import { redirect } from 'sveltekit-flash-message/server';
 
 export const handle: Handle = ({ event, resolve }) => {
-	const requireLogin = event.cookies.get('login') === '1' || event.url.pathname.startsWith('/_/');
-
-	event.locals.authorized = requireLogin && basicAuth(event);
-	if (requireLogin && !event.locals.authorized) {
-		return new Response('401 Unauthorized', {
-			status: 401,
-			headers: {
-				'WWW-Authenticate': 'Basic realm="admin-only", charset="UTF-8"',
-				'Set-Cookie': 'login=; path=/'
-			}
-		});
-	}
+	event.locals.authorized = authorizeAdmin(event);
 
 	return resolve(event);
 };
 
-export const basicAuth = ({ request }: Pick<ServerLoadEvent, 'request'>) => {
-	const authorization = request.headers.get('Authorization');
-	if (!authorization || !authorization.startsWith('Basic ')) return false;
+export const authorizeAdmin = ({ cookies, url }: Pick<RequestEvent, 'cookies' | 'url'>) => {
+	const cookieKey = cookies.get('adminKey');
+	if (cookieKey === ADMIN_KEY && !url.searchParams.has('noAdminKey')) return true;
+	else {
+		cookies.delete('adminKey', { path: '/' });
+		if (url.searchParams.has('noAdminKey')) {
+			url.searchParams.delete('noAdminKey');
+			redirect(url, { type: 'success', message: 'Logout berhasil!' }, cookies);
+		}
+	}
 
-	const token = authorization.replace('Basic ', '');
-	const [username, password] = atob(token).split(':');
+	const urlQueryKey = url.searchParams.get('adminKey');
+	if (urlQueryKey === null) return false;
 
-	return username === 'admin' && password === 'admin';
+	url.searchParams.delete('adminKey');
+	if (urlQueryKey === ADMIN_KEY) {
+		cookies.set('adminKey', urlQueryKey, { path: '/' });
+		redirect(url, { type: 'success', message: 'Login berhasil!' }, cookies);
+	} else {
+		redirect(url, { type: 'error', message: 'Kata kunci admin salah!' }, cookies);
+	}
 };

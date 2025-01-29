@@ -38,6 +38,7 @@
 		"svelte": "^5.0.0",
 		"svelte-check": "^4.0.0",
 		"svelte-sonner": "^0.3.28",
+		"sveltekit-flash-message": "^2.4.6",
 		"sveltekit-superforms": "^2.22.1",
 		"tailwind-merge": "^2.6.0",
 		"tailwind-variants": "^0.3.0",
