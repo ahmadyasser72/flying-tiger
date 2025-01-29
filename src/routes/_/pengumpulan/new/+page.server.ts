@@ -3,6 +3,7 @@ import { db } from '$lib/server/db';
 import { pengumpulan } from '$lib/server/db/schema';
 import type { PageServerLoad, Actions } from './$types';
 import { fail } from '@sveltejs/kit';
+import { redirect } from 'sveltekit-flash-message/server';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
@@ -24,6 +25,10 @@ export const actions: Actions = {
 			.onConflictDoUpdate({ target: pengumpulan.slug, set: form.data })
 			.execute();
 
-		return { form, redirectTo: `/p/${pengumpulanLink}` };
+		redirect(
+			`/p/${pengumpulanLink}`,
+			{ type: 'success', message: 'Pengumpulan berhasil dibuat!' },
+			event
+		);
 	}
 };

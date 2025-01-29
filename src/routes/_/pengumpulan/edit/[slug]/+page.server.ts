@@ -4,6 +4,7 @@ import { pengumpulan } from '$lib/server/db/schema';
 import type { PageServerLoad, Actions } from './$types';
 import { error, fail } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
+import { redirect } from 'sveltekit-flash-message/server';
 import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
@@ -32,6 +33,10 @@ export const actions: Actions = {
 			.returning({ pengumpulanLink: pengumpulan.slug })
 			.execute();
 
-		return { form, redirectTo: `/p/${pengumpulanLink}` };
+		redirect(
+			`/p/${pengumpulanLink}`,
+			{ type: 'success', message: `Pengumpulan #${form.data.id} berhasil diperbarui!` },
+			event
+		);
 	}
 };

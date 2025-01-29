@@ -3,7 +3,8 @@ import { pengumpulanItem } from '$lib/server/db/schema';
 import type { Actions, PageServerLoad } from './$types';
 import { formSchema } from './schema';
 import { error } from '@sveltejs/kit';
-import { fail, message, superValidate } from 'sveltekit-superforms';
+import { redirect } from 'sveltekit-flash-message/server';
+import { fail, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -35,6 +36,6 @@ export const actions: Actions = {
 			.onConflictDoUpdate({ target: pengumpulanItem.nama, set: { file, fileExt } })
 			.execute();
 
-		return message(form, 'success');
+		redirect({ type: 'success', message: 'Berhasil mengirimkan pengumpulan!' }, event);
 	}
 };

@@ -4,7 +4,7 @@
 	import { Button } from '$lib/components/ui/button';
 	import type { PageData } from './$types';
 	import PengumpulanView from './pengumpulan-view.svelte';
-	import { LoaderPinwheel, TriangleAlert } from 'lucide-svelte';
+	import { LoaderPinwheel } from 'lucide-svelte';
 
 	let { data }: { data: PageData } = $props();
 </script>

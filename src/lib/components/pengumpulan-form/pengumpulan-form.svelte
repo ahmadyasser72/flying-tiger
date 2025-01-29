@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from '$app/navigation';
 	import { DateTimePicker } from '$lib/components/ui/date-time-picker';
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
@@ -7,27 +6,13 @@
 	import { formSchema, type FormSchema } from '.';
 	import { getLocalTimeZone, now, parseAbsoluteToLocal } from '@internationalized/date';
 	import { LoaderPinwheel } from 'lucide-svelte';
-	import { toast } from 'svelte-sonner';
 	import { type SuperValidated, type Infer, superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
 	let { data }: { data: { form: SuperValidated<Infer<FormSchema>> } } = $props();
 
 	const form = superForm(data.form, {
-		validators: zodClient(formSchema),
-		onUpdate: ({ form, result }) => {
-			if (form.valid) {
-				toast.success(
-					isEdit
-						? `Pengumpulan #${$formData.id} berhasil diperbarui!`
-						: 'Pengumpulan berhasil dibuat!',
-					{
-						duration: 2000,
-						onAutoClose: () => goto(result.data.redirectTo)
-					}
-				);
-			}
-		}
+		validators: zodClient(formSchema)
 	});
 
 	const { form: formData, enhance, delayed } = form;

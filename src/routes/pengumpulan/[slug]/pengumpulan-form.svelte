@@ -4,7 +4,6 @@
 	import { formSchema, type FormSchema } from './schema';
 	import { LoaderPinwheel } from 'lucide-svelte';
 	import prettyBytes from 'pretty-bytes';
-	import { toast } from 'svelte-sonner';
 	import { superForm, fileProxy, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
@@ -13,15 +12,7 @@
 
 	const form = superForm(data.form, {
 		validators: zodClient(formSchema),
-		resetForm: false,
-		onUpdate: ({ form }) => {
-			if (form.valid) {
-				toast.success('Berhasil mengirimkan pengumpulan!', {
-					duration: 2000,
-					onAutoClose: () => window.location.reload()
-				});
-			}
-		}
+		resetForm: false
 	});
 
 	const { form: formData, enhance, delayed } = form;
