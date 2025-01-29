@@ -76,7 +76,7 @@
 				/>
 				<Form.Description>Pengumpulan akan ditutup bila melewati batas waktu.</Form.Description>
 				<Form.FieldErrors />
-				<input hidden value={$formData.batasWaktu} name={props.name} />
+				<input {...props} hidden value={$formData.batasWaktu} />
 			{/snippet}
 		</Form.Control>
 	</Form.Field>
