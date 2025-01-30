@@ -13,7 +13,7 @@
 	{#await data.pengumpulan}
 		<title>Pengumpulan {page.params.slug}</title>
 	{:then pengumpulan}
-		<title>Pengumpulan {pengumpulan?.judul ?? page.params.slug}</title>
+		<title>Pengumpulan {pengumpulan?.judul ?? 'tidak ditemukan!'}</title>
 	{/await}
 </svelte:head>
 
