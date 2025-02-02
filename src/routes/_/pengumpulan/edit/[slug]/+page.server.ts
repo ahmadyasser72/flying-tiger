@@ -9,15 +9,14 @@ import { superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
 export const load: PageServerLoad = async ({ params }) => {
-	const form = await superValidate(zod(formSchema));
-
 	const pengumpulan = await db.query.pengumpulan.findFirst({
 		where: (pengumpulan, { eq }) => eq(pengumpulan.slug, params.slug)
 	});
 	if (pengumpulan === undefined) error(404, 'Not found');
 
-	Object.assign(form.data, pengumpulan);
-	return { form };
+	return {
+		form: await superValidate(pengumpulan, zod(formSchema))
+	};
 };
 
 export const actions: Actions = {
