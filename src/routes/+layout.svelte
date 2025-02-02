@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import LoginForm from '$lib/components/login-form.svelte';
+	import AuthorizeForm from '$lib/components/authorize-form.svelte';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import '../app.css';
 	import type { LayoutData } from './$types';
@@ -28,7 +28,7 @@
 			<a href="/_/pengumpulan/new">Buat pengumpulan</a>
 		{/if}
 
-		<LoginForm />
+		<AuthorizeForm />
 	</header>
 
 	<main class="relative mx-auto flex h-full w-full max-w-[60ch] flex-1 flex-col py-4">
