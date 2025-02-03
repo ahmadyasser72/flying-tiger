@@ -44,6 +44,4 @@
 	</p>
 {/if}
 
-<div class="mt-8">
-	<PengumpulanForm data={{ form }} disabled={lewatBatasWaktu} />
-</div>
+<PengumpulanForm class="mt-8" data={{ form }} disabled={lewatBatasWaktu} />

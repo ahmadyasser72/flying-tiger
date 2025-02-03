@@ -19,7 +19,7 @@
 
 <div class="flex w-full flex-1 flex-col items-center">
 	{#if data.authorized}
-		<div class="mb-4 flex w-full gap-2 border-b pb-4">
+		<div class="mb-4 flex w-full flex-wrap gap-2 border-b pb-4">
 			<Button href="/_/pengumpulan/data/{page.params.slug}">Lihat data</Button>
 			<Button href="/_/pengumpulan/edit/{page.params.slug}">Edit pengumpulan</Button>
 		</div>

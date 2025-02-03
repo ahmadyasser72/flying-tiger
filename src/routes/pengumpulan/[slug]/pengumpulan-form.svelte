@@ -1,14 +1,22 @@
 <script lang="ts">
 	import * as Form from '$lib/components/ui/form';
 	import { Input } from '$lib/components/ui/input';
+	import { cn } from '$lib/utils';
 	import { formSchema, type FormSchema } from './schema';
 	import { LoaderPinwheel } from 'lucide-svelte';
 	import prettyBytes from 'pretty-bytes';
 	import { superForm, fileProxy, type Infer, type SuperValidated } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 
-	let { data, disabled }: { data: { form: SuperValidated<Infer<FormSchema>> }; disabled: boolean } =
-		$props();
+	let {
+		data,
+		disabled,
+		class: className
+	}: {
+		data: { form: SuperValidated<Infer<FormSchema>> };
+		disabled: boolean;
+		class?: string;
+	} = $props();
 
 	const form = superForm(data.form, {
 		validators: zodClient(formSchema),
@@ -20,7 +28,12 @@
 	const file = fileProxy(form, 'file');
 </script>
 
-<form method="POST" enctype="multipart/form-data" use:enhance class="w-full space-y-4">
+<form
+	method="POST"
+	enctype="multipart/form-data"
+	use:enhance
+	class={cn('w-full space-y-4', className)}
+>
 	<Form.Field {form} name="nama">
 		<Form.Control>
 			{#snippet children({ props })}
@@ -51,7 +64,7 @@
 					{#if $file[0]}
 						{@const { name, size } = $file[0]}
 						{@const humanSize = prettyBytes(size, { space: false })}
-						<p>
+						<p class="break-all">
 							<span class="underline">{name}</span>
 							<span class="font-semibold">({humanSize})</span>
 						</p>
