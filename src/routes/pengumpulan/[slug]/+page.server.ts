@@ -8,9 +8,11 @@ import { fail, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
 export const load: PageServerLoad = async ({ params }) => {
+	const { slug } = params;
+
 	return {
 		pengumpulan: db.query.pengumpulan.findFirst({
-			where: (pengumpulan, { eq }) => eq(pengumpulan.slug, params.slug)
+			where: (pengumpulan, { eq }) => eq(pengumpulan.slug, slug)
 		}),
 		form: await superValidate(zod(formSchema))
 	};
