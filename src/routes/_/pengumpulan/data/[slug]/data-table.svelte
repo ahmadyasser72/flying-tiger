@@ -62,7 +62,7 @@
 </script>
 
 <div class="mb-2 flex justify-between">
-	<Button target="_blank" href={downloadSelectedRowFilesUrl}>
+	<Button href={downloadSelectedRowFilesUrl}>
 		Download {selectedRows.length} data
 	</Button>
 	<Button href="/p/{page.params.slug}" variant="outline">Kembali ke pengumpulan</Button>
