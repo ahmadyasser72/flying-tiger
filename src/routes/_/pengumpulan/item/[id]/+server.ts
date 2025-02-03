@@ -14,12 +14,9 @@ const downloadSingle = async (id: number, download: boolean) => {
 	const { nama, file, fileExt } = item;
 	const headers = new Headers({
 		'Content-Length': file.byteLength.toString(),
-		'Content-Type': mime.getType(fileExt) ?? 'application/octet-stream'
+		'Content-Type': mime.getType(fileExt) ?? 'application/octet-stream',
+		'Content-Disposition': `${download ? 'attachment' : 'inline'}; filename="${nama}.${fileExt}"`
 	});
-
-	if (download) {
-		headers.append('Content-Disposition', `attachment; filename="${nama}.${fileExt}"`);
-	}
 
 	return new Response(file, { headers });
 };
