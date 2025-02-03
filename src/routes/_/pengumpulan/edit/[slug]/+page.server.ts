@@ -2,10 +2,10 @@ import { formSchema } from '$lib/components/pengumpulan-form';
 import { db } from '$lib/server/db';
 import { pengumpulan } from '$lib/server/db/schema';
 import type { PageServerLoad, Actions } from './$types';
-import { error, fail } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { eq } from 'drizzle-orm';
 import { redirect } from 'sveltekit-flash-message/server';
-import { superValidate } from 'sveltekit-superforms';
+import { fail, setError, superValidate } from 'sveltekit-superforms';
 import { zod } from 'sveltekit-superforms/adapters';
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -25,17 +25,23 @@ export const actions: Actions = {
 		if (!form.valid) return fail(400, { form });
 		else if (form.data.id === undefined) return fail(400, { form });
 
-		const [{ pengumpulanLink }] = await db
+		const existing = await db.query.pengumpulan
+			.findFirst({
+				where: (pengumpulan, { and, eq, ne }) =>
+					and(eq(pengumpulan.slug, form.data.slug), ne(pengumpulan.id, form.data.id!))
+			})
+			.execute();
+		if (existing !== undefined) {
+			return setError(form, 'slug', 'Link tidak tersedia!');
+		}
+
+		const [{ slug }] = await db
 			.update(pengumpulan)
 			.set(form.data)
 			.where(eq(pengumpulan.id, form.data.id))
-			.returning({ pengumpulanLink: pengumpulan.slug })
+			.returning({ slug: pengumpulan.slug })
 			.execute();
 
-		redirect(
-			`/p/${pengumpulanLink}`,
-			{ type: 'success', message: `Pengumpulan #${form.data.id} berhasil diperbarui!` },
-			event
-		);
+		redirect(`/p/${slug}`, { type: 'success', message: `Berhasil update pengumpulan!` }, event);
 	}
 };
