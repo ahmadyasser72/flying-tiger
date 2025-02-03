@@ -19,11 +19,12 @@ export const pengumpulanItem = sqliteTable('pengumpulan_item', {
 		.references(() => pengumpulan.id)
 		.notNull(),
 	nama: text('name').unique().notNull(),
-	file: blob('file', { mode: 'buffer' }).$type<ArrayBuffer>().notNull(),
-	fileExt: text('file_ext').notNull(),
 	waktuPengumpulan: integer('submit_time', { mode: 'timestamp_ms' })
 		.notNull()
-		.default(sql`(unixepoch() * 1000)`)
+		.default(sql`(unixepoch() * 1000)`),
+	file: blob('file', { mode: 'buffer' }).$type<ArrayBuffer>().notNull(),
+	fileExt: text('file_ext').notNull(),
+	fileSize: integer('file_size').notNull()
 });
 
 export const pengumpulanItemRelations = relations(pengumpulanItem, ({ one }) => ({

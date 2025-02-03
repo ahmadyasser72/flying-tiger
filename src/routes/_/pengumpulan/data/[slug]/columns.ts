@@ -4,12 +4,14 @@ import { dateTimeFormatter } from '$lib/utils';
 import DataTableActions from './data-table-actions.svelte';
 import DataTableSortableColumn from './data-table-sortable-column.svelte';
 import type { ColumnDef } from '@tanstack/table-core';
+import prettyBytes from 'pretty-bytes';
 import { createRawSnippet } from 'svelte';
 
 export interface PengumpulanItem {
 	id: number;
 	nama: string;
 	waktuPengumpulan: Date;
+	fileSize: number;
 }
 
 export const columns: ColumnDef<PengumpulanItem>[] = [
@@ -38,10 +40,31 @@ export const columns: ColumnDef<PengumpulanItem>[] = [
 			})
 	},
 	{
+		accessorKey: 'fileSize',
+		header: ({ column }) =>
+			renderComponent(DataTableSortableColumn, {
+				column: { label: 'Ukuran' },
+				onclick: () => column.toggleSorting(column.getIsSorted() === 'asc')
+			}),
+		cell: ({ row }) => {
+			const submitTimeSnippet = createRawSnippet<[string]>((getFileSize) => {
+				const fileSize = getFileSize();
+				return {
+					render: () => `<div class="font-medium">${fileSize}</div>`
+				};
+			});
+
+			return renderSnippet(
+				submitTimeSnippet,
+				prettyBytes(row.getValue('fileSize'), { space: false })
+			);
+		}
+	},
+	{
 		accessorKey: 'waktuPengumpulan',
 		header: ({ column }) =>
 			renderComponent(DataTableSortableColumn, {
-				column: { label: 'Waktu Pengumpulan' },
+				column: { label: 'Waktu' },
 				onclick: () => column.toggleSorting(column.getIsSorted() === 'asc')
 			}),
 		cell: ({ row }) => {

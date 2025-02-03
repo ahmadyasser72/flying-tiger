@@ -30,10 +30,12 @@ export const actions: Actions = {
 		const { nama, file: fileBlob } = form.data;
 		const file = await fileBlob.arrayBuffer();
 		const fileExt = fileBlob.name.split('.').slice(1).join('.');
+		const fileSize = file.byteLength;
+
 		await db
 			.insert(pengumpulanItem)
-			.values({ nama, file, fileExt, pengumpulanId: pengumpulan.id })
-			.onConflictDoUpdate({ target: pengumpulanItem.nama, set: { file, fileExt } })
+			.values({ nama, file, fileExt, fileSize, pengumpulanId: pengumpulan.id })
+			.onConflictDoUpdate({ target: pengumpulanItem.nama, set: { file, fileExt, fileSize } })
 			.execute();
 
 		redirect({ type: 'success', message: 'Berhasil mengirimkan pengumpulan!' }, event);
