@@ -53,18 +53,18 @@
 	});
 
 	const selectedRows = $derived(table.getSelectedRowModel().rows);
-	const downloadSelectedRowFilesUrl = $derived.by(() => {
-		if (selectedRows.length === 0) return;
-
-		const ids = selectedRows.map(({ original }) => original.id);
-		return `/_/pengumpulan/item/${ids.join('+')}`;
-	});
 </script>
 
 <div class="mb-2 flex justify-between">
-	<Button href={downloadSelectedRowFilesUrl}>
-		Download {selectedRows.length} data
-	</Button>
+	<form action="/_/pengumpulan/download-item" method="POST" class="contents">
+		{#each selectedRows as { original }}
+			<input type="hidden" name="id" value={original.id} />
+		{/each}
+		<Button type="submit" disabled={selectedRows.length === 0}
+			>Download {selectedRows.length} data</Button
+		>
+	</form>
+
 	<Button href="/p/{page.params.slug}" variant="outline">Kembali ke pengumpulan</Button>
 </div>
 

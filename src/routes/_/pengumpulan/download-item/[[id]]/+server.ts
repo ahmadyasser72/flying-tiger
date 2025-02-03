@@ -4,7 +4,9 @@ import { error } from '@sveltejs/kit';
 import { createZip } from 'littlezipper';
 import mime from 'mime';
 
-const downloadSingle = async (id: number, download: boolean) => {
+const downloadSingle = async (id: number, forceDownload: boolean) => {
+	if (isNaN(id)) error(404, 'Not found');
+
 	const item = await db.query.pengumpulanItem.findFirst({
 		columns: { nama: true, file: true, fileExt: true },
 		where: (item, { eq }) => eq(item.id, id)
@@ -15,13 +17,15 @@ const downloadSingle = async (id: number, download: boolean) => {
 	const headers = new Headers({
 		'Content-Length': file.byteLength.toString(),
 		'Content-Type': mime.getType(fileExt) ?? 'application/octet-stream',
-		'Content-Disposition': `${download ? 'attachment' : 'inline'}; filename="${nama}.${fileExt}"`
+		'Content-Disposition': `${forceDownload ? 'attachment' : 'inline'}; filename="${nama}.${fileExt}"`
 	});
 
 	return new Response(file, { headers });
 };
 
 const downloadMultiple = async (ids: number[]) => {
+	if (ids.some(isNaN)) error(400, 'Bad request');
+
 	const items = await db.query.pengumpulanItem.findMany({
 		columns: { nama: true, file: true, fileExt: true, waktuPengumpulan: true },
 		where: (item, { eq, or }) => or(...ids.map((id) => eq(item.id, id))),
@@ -47,11 +51,17 @@ const downloadMultiple = async (ids: number[]) => {
 };
 
 export const GET: RequestHandler = async ({ params, url }) => {
-	const ids = params.id.split('+');
-	if (ids.length > 1) {
-		return downloadMultiple(ids.map(Number));
-	} else {
-		const id = Number(ids[0]);
-		return downloadSingle(id, url.searchParams.get('download') === '1');
-	}
+	if (params.id === undefined) error(404, 'Not found');
+
+	const id = Number(params.id);
+	const forceDownload = url.searchParams.get('download') === '1';
+	return downloadSingle(id, forceDownload);
+};
+
+export const POST: RequestHandler = async ({ request }) => {
+	const form = await request.formData();
+	const ids = form.getAll('id');
+	if (ids.length === 0) error(400, 'Bad request');
+
+	return downloadMultiple(ids.map(Number));
 };
