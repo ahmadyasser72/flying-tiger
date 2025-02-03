@@ -2,7 +2,7 @@
 	import { Button } from '$lib/components/ui/button';
 
 	let { id }: { id: number } = $props();
-	const url = $derived(`/_/pengumpulan/download-item/${id}`);
+	const url = $derived(`/admin/pengumpulan/download-item/${id}`);
 </script>
 
 <div class="flex gap-x-2">

@@ -56,7 +56,7 @@
 </script>
 
 <div class="mb-2 flex justify-between">
-	<form action="/_/pengumpulan/download-item" method="POST" class="contents">
+	<form action="/admin/pengumpulan/download-item" method="POST" class="contents">
 		{#each selectedRows as { original }}
 			<input type="hidden" name="id" value={original.id} />
 		{/each}

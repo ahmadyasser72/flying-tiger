@@ -32,7 +32,7 @@
 		<a href="/">Home</a>
 
 		{#if data.authorized}
-			<a href="/_/pengumpulan/new">Buat pengumpulan</a>
+			<a href="/admin/pengumpulan/new">Buat pengumpulan</a>
 		{/if}
 
 		<AuthorizeForm />
