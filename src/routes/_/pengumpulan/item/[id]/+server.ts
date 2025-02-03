@@ -1,7 +1,7 @@
 import { db } from '$lib/server/db';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
-import { zipSync } from 'fflate';
+import { createZip } from 'littlezipper';
 import mime from 'mime';
 
 const downloadSingle = async (id: number, download: boolean) => {
@@ -23,18 +23,18 @@ const downloadSingle = async (id: number, download: boolean) => {
 
 const downloadMultiple = async (ids: number[]) => {
 	const items = await db.query.pengumpulanItem.findMany({
-		columns: { nama: true, file: true, fileExt: true },
+		columns: { nama: true, file: true, fileExt: true, waktuPengumpulan: true },
 		where: (item, { eq, or }) => or(...ids.map((id) => eq(item.id, id))),
 		with: { pengumpulan: { columns: { judul: true } } }
 	});
 	if (items.length === 0) error(404, 'Not found');
 
-	const zipFile = zipSync(
-		Object.fromEntries(
-			items.map(({ nama, file, fileExt }) => {
-				return [`${nama}.${fileExt}`, new Uint8Array(file)];
-			})
-		)
+	const zipFile = await createZip(
+		items.map(({ nama, file, fileExt, waktuPengumpulan }) => ({
+			path: `${nama}.${fileExt}`,
+			data: file,
+			lastModified: waktuPengumpulan
+		}))
 	);
 
 	return new Response(zipFile, {
