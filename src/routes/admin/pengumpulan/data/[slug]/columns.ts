@@ -79,8 +79,8 @@ export const columns: ColumnDef<PengumpulanItem>[] = [
 		}
 	},
 	{
-		accessorKey: 'file',
-		header: 'File',
+		id: 'actions',
+		header: 'Actions',
 		cell: ({ row }) => renderComponent(DataTableActions, { id: row.original.id })
 	}
 ];
