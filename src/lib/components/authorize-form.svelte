@@ -20,7 +20,7 @@
 
 {#snippet authorizeForm(type: 'login' | 'logout')}
 	<form
-		action="/authorize?/{type}"
+		action="/admin/authorize?/{type}"
 		method="POST"
 		class="grid gap-2"
 		use:enhance={() => {
