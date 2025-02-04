@@ -19,7 +19,7 @@ export const pengumpulanItem = sqliteTable('pengumpulan_item', {
 		.references(() => pengumpulan.id)
 		.notNull(),
 	nama: text('name').unique().notNull(),
-	waktuPengumpulan: integer('submit_time', { mode: 'timestamp_ms' })
+	waktuKirim: integer('submit_time', { mode: 'timestamp_ms' })
 		.notNull()
 		.default(sql`(unixepoch() * 1000)`),
 	file: blob('file', { mode: 'buffer' }).$type<ArrayBuffer>().notNull(),

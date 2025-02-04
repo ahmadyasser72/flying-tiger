@@ -10,7 +10,7 @@ import { createRawSnippet } from 'svelte';
 export interface PengumpulanItem {
 	id: number;
 	nama: string;
-	waktuPengumpulan: Date;
+	waktuKirim: Date;
 	fileSize: number;
 }
 
@@ -61,7 +61,7 @@ export const columns: ColumnDef<PengumpulanItem>[] = [
 		}
 	},
 	{
-		accessorKey: 'waktuPengumpulan',
+		accessorKey: 'waktuKirim',
 		header: ({ column }) =>
 			renderComponent(DataTableSortableColumn, {
 				column: { label: 'Waktu' },
@@ -75,10 +75,7 @@ export const columns: ColumnDef<PengumpulanItem>[] = [
 				};
 			});
 
-			return renderSnippet(
-				submitTimeSnippet,
-				dateTimeFormatter.format(row.getValue('waktuPengumpulan'))
-			);
+			return renderSnippet(submitTimeSnippet, dateTimeFormatter.format(row.getValue('waktuKirim')));
 		}
 	},
 	{

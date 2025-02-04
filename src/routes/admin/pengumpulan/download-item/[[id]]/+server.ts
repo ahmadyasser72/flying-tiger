@@ -29,17 +29,17 @@ const downloadMultiple = async (ids: number[]) => {
 	if (ids.some(isNaN)) error(400, 'Bad request');
 
 	const items = await db.query.pengumpulanItem.findMany({
-		columns: { nama: true, file: true, fileName: true, waktuPengumpulan: true },
+		columns: { nama: true, file: true, fileName: true, waktuKirim: true },
 		where: (item, { eq, or }) => or(...ids.map((id) => eq(item.id, id))),
 		with: { pengumpulan: { columns: { judul: true } } }
 	});
 	if (items.length === 0) error(404, 'Not found');
 
 	const zipFile = await createZip(
-		items.map(({ nama, file, fileName, waktuPengumpulan }) => ({
+		items.map(({ nama, file, fileName, waktuKirim }) => ({
 			path: inheritFileExtension(fileName, nama),
 			data: file,
-			lastModified: waktuPengumpulan
+			lastModified: waktuKirim
 		}))
 	);
 
