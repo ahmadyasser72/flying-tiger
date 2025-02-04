@@ -1,4 +1,5 @@
 import { db } from '$lib/server/db';
+import { inheritFileExtension } from '$lib/utils';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
 import { createZip } from 'littlezipper';
@@ -8,34 +9,35 @@ const downloadSingle = async (id: number, forceDownload: boolean) => {
 	if (isNaN(id)) error(404, 'Not found');
 
 	const item = await db.query.pengumpulanItem.findFirst({
-		columns: { nama: true, file: true, fileExt: true },
+		columns: { nama: true, file: true, fileName: true },
 		where: (item, { eq }) => eq(item.id, id)
 	});
 	if (item === undefined) error(404, 'Not found');
 
-	const { nama, file, fileExt } = item;
-	const headers = new Headers({
-		'Content-Length': file.byteLength.toString(),
-		'Content-Type': mime.getType(fileExt) ?? 'application/octet-stream',
-		'Content-Disposition': `${forceDownload ? 'attachment' : 'inline'}; filename="${nama}.${fileExt}"`
+	const { nama, file, fileName: originalFileName } = item;
+	const fileName = inheritFileExtension(originalFileName, nama);
+	return new Response(file, {
+		headers: {
+			'Content-Length': file.byteLength.toString(),
+			'Content-Type': mime.getType(originalFileName) ?? 'application/octet-stream',
+			'Content-Disposition': `${forceDownload ? 'attachment' : 'inline'}; filename="${fileName}"`
+		}
 	});
-
-	return new Response(file, { headers });
 };
 
 const downloadMultiple = async (ids: number[]) => {
 	if (ids.some(isNaN)) error(400, 'Bad request');
 
 	const items = await db.query.pengumpulanItem.findMany({
-		columns: { nama: true, file: true, fileExt: true, waktuPengumpulan: true },
+		columns: { nama: true, file: true, fileName: true, waktuPengumpulan: true },
 		where: (item, { eq, or }) => or(...ids.map((id) => eq(item.id, id))),
 		with: { pengumpulan: { columns: { judul: true } } }
 	});
 	if (items.length === 0) error(404, 'Not found');
 
 	const zipFile = await createZip(
-		items.map(({ nama, file, fileExt, waktuPengumpulan }) => ({
-			path: `${nama}.${fileExt}`,
+		items.map(({ nama, file, fileName, waktuPengumpulan }) => ({
+			path: inheritFileExtension(fileName, nama),
 			data: file,
 			lastModified: waktuPengumpulan
 		}))

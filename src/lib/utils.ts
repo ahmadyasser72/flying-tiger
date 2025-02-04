@@ -12,4 +12,10 @@ export const dateTimeFormatter = new DateFormatter('id-ID', {
 	timeStyle: 'short'
 });
 
+export const getFileExtension = (source: string) => source.split('.').pop();
+export const inheritFileExtension = (source: string, target: string) => {
+	const ext = getFileExtension(source);
+	return ext !== undefined ? `${target}.${ext}` : target;
+};
+
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

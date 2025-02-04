@@ -23,7 +23,7 @@ export const pengumpulanItem = sqliteTable('pengumpulan_item', {
 		.notNull()
 		.default(sql`(unixepoch() * 1000)`),
 	file: blob('file', { mode: 'buffer' }).$type<ArrayBuffer>().notNull(),
-	fileExt: text('file_ext').notNull(),
+	fileName: text('file_name').notNull(),
 	fileSize: integer('file_size').notNull()
 });
 
