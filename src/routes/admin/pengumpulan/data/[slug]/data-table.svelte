@@ -11,6 +11,7 @@
 		type RowSelectionState,
 		type SortingState
 	} from '@tanstack/table-core';
+	import prettyBytes from 'pretty-bytes';
 
 	type DataTableProps<TData, TValue> = {
 		columns: ColumnDef<TData, TValue>[];
@@ -55,17 +56,22 @@
 	const selectedRows = $derived(table.getSelectedRowModel().rows);
 </script>
 
-<div class="mb-2 flex justify-between">
+<div class="mb-2 flex flex-wrap justify-between gap-2 max-sm:flex-col-reverse">
 	<form action="/admin/pengumpulan/download-item" method="POST" class="contents">
-		{#each selectedRows as { original }}
-			<input type="hidden" name="id" value={original.id} />
-		{/each}
-		<Button type="submit" disabled={selectedRows.length === 0}
-			>Download {selectedRows.length} data</Button
-		>
+		{#if selectedRows.length > 0}
+			{@const totalSize = selectedRows.reduce((acc, { original }) => acc + original.fileSize, 0)}
+			{@const humanTotalSize = prettyBytes(totalSize, { space: false })}
+			<Button type="submit">Download {selectedRows.length} data (~{humanTotalSize})</Button>
+
+			{#each selectedRows as { original }}
+				<input type="hidden" name="id" value={original.id} />
+			{/each}
+		{:else}
+			<Button disabled>Pilih data yang ingin di download &hellip;</Button>
+		{/if}
 	</form>
 
-	<Button href="/p/{page.params.slug}" variant="outline">Kembali ke pengumpulan</Button>
+	<Button target="_blank" href="/p/{page.params.slug}" variant="outline">Buka pengumpulan</Button>
 </div>
 
 <div class="rounded-md border">
