@@ -72,4 +72,18 @@
 	body {
 		@apply bg-background text-foreground;
 	}
+
+	::-webkit-scrollbar {
+		@apply h-2 w-2;
+	}
+	::-webkit-scrollbar-track {
+		@apply !bg-muted;
+	}
+	::-webkit-scrollbar-thumb {
+		@apply rounded-sm !bg-muted-foreground/50;
+	}
+	html {
+		scrollbar-color: hsl(215.4 16.3% 46.9% / 0.3);
+		scrollbar-width: thin;
+	}
 }
